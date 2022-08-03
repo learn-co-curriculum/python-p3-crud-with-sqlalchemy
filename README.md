@@ -102,8 +102,76 @@ Before we begin transactions on our database, let's take a moment to build upon
 the `Student` model from the previous lesson:
 
 ```py
+#!/usr/bin/env python3
 
+# imports
+from datetime import datetime
+from sqlalchemy import (CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
+    Index, Column, DateTime, Integer, String)
+
+class Student(Base):
+    __tablename__ = 'students'
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            'student_id',
+            name='id_pk'),
+        UniqueConstraint(
+            'student_email',
+            name='unique_email'),
+        CheckConstraint(
+            'student_grade BETWEEN 1 AND 12',
+            name='grade_between_1_and_12'))
+
+    Index('index_student_name', 'student_name')
+
+    student_id = Column(Integer())
+    student_name = Column(String())
+    student_email = Column(String(55))
+    student_grade = Column(Integer())
+    student_birthday = Column(DateTime())
+    student_enrolled_date = Column(DateTime(), default=datetime.now())
+
+# script
 ```
+
+Let's break down some of the new features in the `Student` model:
+
+#### Constraints
+
+Along with keys, constraints help ensure that our data meets certain criteria
+before being stored in the database. Constraints are stored in the optional
+`__table_args__` class attribute. There are three main classes of constraint:
+
+1. `PrimaryKeyConstraint`: assigns primary key status to a `Column`. This can
+   also be accomplished through the optional `primary_key` argument to the
+   `Column` class constructor.
+2. `UniqueConstraint`: checks new records to ensure that they do not match
+   existing records at unique `Column`s.
+3. `CheckConstraint`: uses SQL statements to check if new values meet
+   specific criteria.
+
+Our new constraints for the `Student` model ensure that `student_id` is a
+primary key, `student_email` is unique, and `student_grade` is between 1 and
+12.
+
+#### Indexes
+
+Indexes are used to speed up lookups on certain column values. Since teachers
+and administrators don't typically know their student's ID numbers off the top
+of their heads, it's wise to set up an index for `student_name` in preparation
+for people using it in their database transactions.
+
+#### Input Sizes, Defaults, and More
+
+SQLAlchemy provides a number of other optional arguments in the `Column` and
+data-type constructors that will allow you to make your code more specific and
+secure. Explore [the `Column` documentation][column] to learn more.
+
+***
+
+## Creating Records
+
+***
 
 ## Lesson Section
 
@@ -154,4 +222,4 @@ will be able to do moving forward.
 - [Resource 1](https://www.python.org/doc/essays/blurb/)
 - [Reused Resource][reused resource]
 
-[reused resource]: https://docs.python.org/3/
+[columns]: https://docs.sqlalchemy.org/en/14/core/sqlelement.html

@@ -1,0 +1,6 @@
+---
+:lessons:
+- :id: 210105
+  :course_id: 5935
+  :canvas_url: https://learning.flatironschool.com/courses/5935/pages/create-read-update-and-delete-with-sqlalchemy
+  :type: page
