@@ -131,6 +131,11 @@ class Student(Base):
     student_birthday = Column(DateTime())
     student_enrolled_date = Column(DateTime(), default=datetime.now())
 
+    def __repr__(self):
+        return f"Student {self.student_id}: " \
+            + f"{self.student_name}, " \
+            + f"Grade {self.student_grade}"
+
 # script
 ```
 
@@ -161,6 +166,22 @@ and administrators don't typically know their student's ID numbers off the top
 of their heads, it's wise to set up an index for `student_name` in preparation
 for people using it in their database transactions.
 
+#### `__repr__`
+
+All classes in Python have a `__repr__` instance method that determines their
+standard output value (i.e. what you see when you `print()` the object). By
+default, this shows the classname and an arbitrary ID. This default value is not
+very helpful in telling different objects apart. (At least not to humans.)
+
+The `__repr__` method in our refactored `Student` class will output a much more
+helpful string:
+
+```py
+my_student = Student(...)
+print(my_student)
+# => Student 1: Joseph Smith, Grade 4
+```
+
 #### Input Sizes, Defaults, and More
 
 SQLAlchemy provides a number of other optional arguments in the `Column` and
@@ -171,7 +192,203 @@ secure. Explore [the `Column` documentation][column] to learn more.
 
 ## Creating Records
 
+Now that we have a session and a robust data model, let's start populating a
+database.
+
+To create a new student record in our database, we need to create an object
+using the `Student` class. This syntax is the same as with instantiating any
+other Python class.
+
+> **Note**: while we can enter the data in order without argument names, we
+> are going to use them consistently in class constructors when using
+> SQLAlchemy. This is because it makes our code much more readable when working
+> with tables with many columns.
+
+```py
+# imports, models, script
+    
+    engine = create_engine('sqlite:///:memory:')
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    albert_einstein = Student(
+        student_name="Albert Einstein",
+        student_email="albert.einstein@zurich.edu",
+        student_grade=6,
+        student_birthday=datetime(
+            year=1879,
+            month=3,
+            day=14
+        ),
+    )
+    
+    session.add(albert_einstein)
+    session.commit()
+
+    print(f"New student ID is {albert_einstein.student_id}.")
+
+# => New student ID is 1.
+```
+
+After creating a `Student` object, `session.add()` generates a statement to
+include in the session's transaction, then `session.commit()` executes all
+statements in the transaction and saves any changes to the database.
+`session.commit()` will also update your `Student` object with a `student_id`.
+
+If we want to save multiple new records in a single line of code, we can use
+the session's `bulk_save_objects()` instance method:
+
+```py
+# imports, models, script
+
+    albert_einstein = Student(
+        student_name="Albert Einstein",
+        student_email="albert.einstein@zurich.edu",
+        student_grade=6,
+        student_birthday=datetime(
+            year=1879,
+            month=3,
+            day=14
+        ),
+    )
+
+    alan_turing = Student(
+        student_name="Alan Turing",
+        student_email="alan.turing@sherborne.edu",
+        student_grade=11,
+        student_birthday=datetime(
+            year=1912,
+            month=6,
+            day=23
+        ),
+    )
+
+    session.bulk_save_objects([albert_einstein, alan_turing])
+    session.commit()
+
+    print(f"New student ID is {albert_einstein.student_id}.")
+    print(f"New student ID is {alan_turing.student_id}.")
+
+# => New student ID is None.
+# => New student ID is None.
+```
+
+Unfortunately, `bulk_save_objects()` does not associate the records with the
+session, so we don't update our records' IDs. Take this into consideration when
+creating records in your own code.
+
+Run `lib/sqlalchemy_sandbox.py` to make sure that there are no errors in your
+code. Once you're seeing the same output as above, let's practice retrieving
+these new records from the database.
+
 ***
+
+## Read Records
+
+There are many qays to structure a query in SQLAlchemy, but they all begin with
+the session's `query()` instance method:
+
+```py
+# imports, models, script
+
+    session.bulk_save_objects([albert_einstein, alan_turing])
+    session.commit()
+
+    students = session.query(Student)
+    print([student for student in students])
+
+# => [Student 1: Albert Einstein, Grade 6, Student 2: Alan Turing, Grade 11]
+```
+
+We would see the same output using the `all()` instance method:
+
+```py
+# imports, models, script
+
+    session.bulk_save_objects([albert_einstein, alan_turing])
+    session.commit()
+
+    students = session.query(Student).all()
+    print(students)
+
+# => [Student 1: Albert Einstein, Grade 6, Student 2: Alan Turing, Grade 11]
+```
+
+The former strategy is considered best practice, as it accesses the returned
+objects one at a time and is thus more memory-efficient.
+
+<details>
+  <summary>
+    <em>Which method helps make an object's standard ouptut human-readable?</em>
+  </summary>
+
+  <h3><code>__repr__</code></h3>
+</details>
+<br/>
+
+### Selecting Only Certain Columns
+
+By default, the `query()` method returns complete records from the data model
+passed in as an argument. If we're only looking for certain fields, we can
+specify this in the arguments we pass to `query()`. Here's how we would retrieve
+all of the students' names:
+
+```py
+# imports, models, script
+
+    student_names = [name for name in session.query(Student.student_name)]
+    print(student_names)
+
+# => [('Albert Einstein',), ('Alan Turing',)]
+```
+
+### Ordering
+
+By default, results from any database query are ordered by their primary key.
+The `order_by()` method allows us to sort by any column:
+
+```py
+# imports, models, script
+
+    students_by_name = [student for student in session.query(
+            Student.student_name).order_by(
+            Student.student_name)]
+    print(students_by_name)
+
+# => [('Alan Turing',), ('Albert Einstein',)]
+```
+
+<details>
+  <summary>
+    <em>What data type does <code>query()</code> return records in?</em>
+  </summary>
+
+  <h3><code>tuple</code></h3>
+</details>
+<br/>
+
+To sort results in descending order, we need to import the `desc()` function:
+
+```py
+# imports, models, script
+from sqlalchemy import desc
+
+    students_by_grade_desc = [student for student in session.query(
+            Student.student_name, Student.student_grade).order_by(
+            desc(Student.student_grade))]
+    print(students_by_grade_desc)
+
+# => [('Alan Turing', 11), ('Albert Einstein', 6)]
+```
+
+### Limiting
+
+
+
+The `first()` method can also be helpful in certain situations: as the name
+suggests, it returns only the first matching record from the database.
 
 ## Lesson Section
 
