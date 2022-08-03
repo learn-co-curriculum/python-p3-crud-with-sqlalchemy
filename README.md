@@ -287,7 +287,7 @@ these new records from the database.
 
 ## Read Records
 
-There are many qays to structure a query in SQLAlchemy, but they all begin with
+There are many ways to structure a query in SQLAlchemy, but they all begin with
 the session's `query()` instance method:
 
 ```py
@@ -385,10 +385,77 @@ from sqlalchemy import desc
 
 ### Limiting
 
+To limit your result set to the first `x` records, you can use the `limit()`
+method:
 
+```py
+# imports, models, script
 
-The `first()` method can also be helpful in certain situations: as the name
-suggests, it returns only the first matching record from the database.
+    oldest_student = [student for student in session.query(
+            Student.student_name, Student.student_birthday).order_by(
+            desc(Student.student_grade)).limit(1)]
+    print(oldest_student)
+
+# => [('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))]
+```
+
+The `first()` method is a quick and easy way to execute a `limit(1)` statement
+and does not require a list interpretation:
+
+```py
+# imports, models, script
+
+    oldest_student = session.query(
+            Student.student_name, Student.student_birthday).order_by(
+            desc(Student.student_grade)).first()
+    print(oldest_student)
+
+# => ('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))
+```
+
+### `func`
+
+Importing the `func` module from `sqlalchemy` gives us access to common SQL
+operations through functions like `sum()` and `count()`. As these operations
+act upon columns, we carry them out through wrapping a `Column` object passed
+to the `query()` method:
+
+```py
+# imports, models, script
+from sqlalchemy import func
+
+    student_count = session.query(func.count(Student.student_id)).first()
+    print(student_count)
+
+# => (2,)
+```
+
+It is best practice to call these functions as `func.operation()` rather than
+their name alone because many of these functions have name conflicts with
+functions in the Python standard library, such as `sum()`.
+
+### Filtering
+
+Retrieving specific records requires use of the `filter()` method. A typical
+`filter()` statement has a column, a standard operator, and a value. It is
+possible to chain multiple `filter()` statements together, though it is
+typically easier to read with comma-separated clauses inside of one `filter()`
+statement.
+
+```py
+# imports, models, script
+
+    query = session.query(Student).filter(Student.student_name.like('%Alan%'),
+        Student.student_grade == 11)
+    for record in query:
+        print(record.student_name)
+
+# => Alan Turing
+```
+
+***
+
+## Updating Data
 
 ## Lesson Section
 
@@ -439,4 +506,4 @@ will be able to do moving forward.
 - [Resource 1](https://www.python.org/doc/essays/blurb/)
 - [Reused Resource][reused resource]
 
-[columns]: https://docs.sqlalchemy.org/en/14/core/sqlelement.html
+[column]: https://docs.sqlalchemy.org/en/14/core/sqlelement.html
