@@ -2,8 +2,8 @@
 
 ## Learning Goals
 
-- Learning goal 1.
-- Learning goal 2.
+- Use an external library to simplify tasks from ORM and Advanced ORM.
+- Use SQLAlchemy to create, read, update and delete records in a SQL database.
 
 ***
 
