@@ -457,53 +457,115 @@ statement.
 
 ## Updating Data
 
-## Lesson Section
-
-Lorem ipsum dolor sit amet. Ut velit fugit et porro voluptas quia sequi quo
-libero autem qui similique placeat eum velit autem aut repellendus quia. Et
-Quis magni ut fugit obcaecati in expedita fugiat est iste rerum qui ipsam
-ducimus et quaerat maxime sit eaque minus. Est molestias voluptatem et nostrum
-recusandae qui incidunt Quis 33 ipsum perferendis sed similique architecto.
+There are several ways to update data using SQLAlchemy ORM. The simplest is to
+use Python to modify objects directly and then commit those changes through the
+session. For instance, let's say that a new school year is starting and our
+students all need to be moved up a grade:
 
 ```py
-# python code block
-print("statement")
-# => statement
+# imports, models, script
+
+    for student in session.query(Student):
+        student.student_grade += 1
+    
+    session.commit()
+
+    print([(student.student_name,
+        student.student_grade) for student in session.query(Student)])
+
+# => [('Albert Einstein', 7), ('Alan Turing', 12)]
 ```
 
-```js
-// javascript code block
-console.log("use these for comparisons between languages.")
-// => use these for comparisons between languages.
+The `update()` method allows us to update records without creating objects
+beforehand. Here's how we would carry out the same statement with `update()`:
+
+```py
+# imports, models, script
+
+    session.query(Student).update({
+        Student.student_grade: Student.student_grade + 1
+    })
+    
+    print([(student.student_name,
+        student.student_grade) for student in session.query(Student)])
+
+# => [('Albert Einstein', 7), ('Alan Turing', 12)]
 ```
 
-```console
-echo "bash/zshell statement"
-# => bash/zshell statement
+> **Note**: chaining of filters and query methods is possible because each
+> method returns a modified version of the original object. Though certain
+> attributes have changed, the returned object still has access to the same
+> methods as the original object.
+
+***
+
+## Deleting Data
+
+To delete a record from your database, you can use the `delete()` method. If
+you have an object in memory that you want to delete, you can call the
+`delete()` method on the object from your `session`:
+
+```py
+# imports, models, script
+
+    query = session.query(
+        Student).filter(
+            Student.student_name == "Albert Einstein")        
+
+    # retrieve first matching record as object
+    albert_einstein = query.first()
+
+    # delete record
+    session.delete(albert_einstein)
+    session.commit()
+
+    # try to retrieve deleted record
+    albert_einstein = query.first()
+    print(albert_einstein)
+
+# => None
 ```
 
-<details>
-  <summary>
-    <em>Check for understanding text goes here! <code>Code statements go here.</code></em>
-  </summary>
+If you don't have a single object ready for deletion but you know the criteria
+for deletion, you can call the `delete()` method from your query instead:
 
-  <h3>Answer.</h3>
-  <p>Elaboration on answer.</p>
-</details>
-<br/>
+```py
+# imports, models, script
+
+    query = session.query(
+        Student).filter(
+            Student.student_name == "Albert Einstein")
+
+    query.delete()
+
+    albert_einstein = query.first()
+    print(albert_einstein)
+
+# => None
+```
+
+This strategy will delete all records returned by your query, so be careful!
 
 ***
 
 ## Conclusion
 
-Conclusion summary paragraph. Include common misconceptions and what students
-will be able to do moving forward.
+This has been a _very_ long lesson, but hopefully you've gotten some good
+practice performing CRUD on databases with SQLAlchemy. Remember that
+**sessions** allow us to interact with databases through SQLAlchemy and that
+those interactions are grouped into **transactions**. There are hundreds of
+methods, operations, and filter criteria available in SQLAlchemy, so make sure
+to keep the [SQLAlchemy ORM documentation][sqlaorm] nearby as you finish up
+Phase 3!
 
 ***
 
 ## Resources
 
-- [Resource 1](https://www.python.org/doc/essays/blurb/)
-- [Reused Resource][reused resource]
+- [SQLAlchemy ORM Documentation][sqlaorm]
+- [SQLAlchemy ORM Session Basics](https://docs.sqlalchemy.org/en/14/orm/session_basics.html)
+- [SQLAlchemy ORM Column Elements and Expressions][column]
+- [SQLAlchemy ORM Querying Guide](https://docs.sqlalchemy.org/en/14/orm/queryguide.html)
 
 [column]: https://docs.sqlalchemy.org/en/14/core/sqlelement.html
+[sqlaorm]: https://docs.sqlalchemy.org/en/14/orm/
