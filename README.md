@@ -108,6 +108,9 @@ the `Student` model from the previous lesson:
 from datetime import datetime
 from sqlalchemy import (CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
     Index, Column, DateTime, Integer, String)
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 class Student(Base):
     __tablename__ = 'students'
