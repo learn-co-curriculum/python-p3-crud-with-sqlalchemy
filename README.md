@@ -324,7 +324,7 @@ objects one at a time and is thus more memory-efficient.
 
 <details>
   <summary>
-    <em>Which method helps make an object's standard ouptut human-readable?</em>
+    <em>Which method helps make an object's standard output human-readable?</em>
   </summary>
 
   <h3><code>__repr__</code></h3>
