@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from lib.sqlalchemy_sandbox import Student
+from sqlalchemy_sandbox import Student
 
 if __name__ == '__main__':
-    pass
+    import ipdb; ipdb.set_trace()
