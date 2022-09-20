@@ -2,9 +2,9 @@
 
 from datetime import datetime
 
-from sqlalchemy import (CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
+from sqlalchemy import (create_engine, desc,
+    CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
     Index, Column, DateTime, Integer, String)
-from sqlalchemy import create_engine, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -70,11 +70,4 @@ if __name__ == '__main__':
     session.bulk_save_objects([albert_einstein, alan_turing])
     session.commit()
 
-    query = session.query(
-        Student).filter(
-            Student.student_name == "Albert Einstein")
-
-    query.delete()
-
-    albert_einstein = query.first()
-    print(albert_einstein)
+    # CRUD goes here!
