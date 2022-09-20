@@ -30,8 +30,8 @@ SQLAlchemy. This required us to define classes that inherited from a common
 used to assign a table name, columns, primary keys, and more.
 
 In this lesson, we'll be building on the same schema. The code from last
-lesson's code-along can be found in `lib/sqlalchemy_sandbox.py`. Run
-`chmod +x lib/sqlalchemy_sandbox.py` to make it executable.
+lesson's code-along can be found in `app/sqlalchemy_sandbox.py`. Run
+`chmod +x app/sqlalchemy_sandbox.py` to make it executable.
 
 > **Note**: we are using a SQLite database in memory now instead of a
 > `students.db` file. This will allow us to make changes to our schema without
@@ -60,15 +60,25 @@ Let's create a session in `sqlalchemy_sandbox.py` so that we can start executing
 statements in `students.db`:
 
 ```py
-# lib/sqlalchemy_sandbox.py
+# app/sqlalchemy_sandbox.py
 
-# imports
+#!/usr/bin/env python3
+
+from datetime import datetime
+
+from sqlalchemy import create_engine, desc, func, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# data models
+Base = declarative_base()
+
+class Student(Base):
+    __tablename__ = 'students'
+
+    student_id = Column(Integer(), primary_key=True)
+    student_name = Column(String())
 
 if __name__ == '__main__':
-    
     engine = create_engine('sqlite:///:memory:')
     Base.metadata.create_all(engine)
 
@@ -78,7 +88,7 @@ if __name__ == '__main__':
     session = Session()
 ```
 
-Run `lib/sqlalchemy_sandbox.py` to persist your schema and create a session.
+Run `app/sqlalchemy_sandbox.py` to persist your schema and create a session.
 You won't see anything yet, but it's always wise to stop and check for errors
 after you change the functionality of your code.
 
@@ -107,12 +117,6 @@ the `Student` model from the previous lesson:
 #!/usr/bin/env python3
 
 # imports
-from datetime import datetime
-from sqlalchemy import (CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
-    Index, Column, DateTime, Integer, String)
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
 
 class Student(Base):
     __tablename__ = 'students'
@@ -125,7 +129,8 @@ class Student(Base):
             name='unique_email'),
         CheckConstraint(
             'student_grade BETWEEN 1 AND 12',
-            name='grade_between_1_and_12'))
+            name='grade_between_1_and_12')
+    )
 
     Index('index_student_name', 'student_name')
 
@@ -142,6 +147,7 @@ class Student(Base):
             + f"Grade {self.student_grade}"
 
 # script
+
 ```
 
 Let's break down some of the new features in the `Student` model:
@@ -171,14 +177,14 @@ and administrators don't typically know their student's ID numbers off the top
 of their heads, it's wise to set up an index for `student_name` in preparation
 for people using it in their database transactions.
 
-#### `__repr__`
+#### `__repr__()`
 
-All classes in Python have a `__repr__` instance method that determines their
+All classes in Python have a `__repr__()` instance method that determines their
 standard output value (i.e. what you see when you `print()` the object). By
 default, this shows the classname and an arbitrary ID. This default value is not
 very helpful in telling different objects apart. (At least not to humans.)
 
-The `__repr__` method in our refactored `Student` class will output a much more
+The `__repr__()` method in our refactored `Student` class will output a much more
 helpful string:
 
 ```py
@@ -210,8 +216,10 @@ other Python class.
 > with tables with many columns.
 
 ```py
-# imports, models, script
-    
+# imports, models
+
+if __name__ == '__main__':
+
     engine = create_engine('sqlite:///:memory:')
     Base.metadata.create_all(engine)
 
@@ -234,6 +242,12 @@ other Python class.
 
     print(f"New student ID is {albert_einstein.student_id}.")
 
+```
+
+Now when we run our script from the command line, we see the following:
+
+```console
+$ python app/sqlalchemy_sandbox.py
 # => New student ID is 1.
 ```
 
@@ -246,7 +260,15 @@ If we want to save multiple new records in a single line of code, we can use
 the session's `bulk_save_objects()` instance method:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    engine = create_engine('sqlite:///:memory:')
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
     albert_einstein = Student(
         student_name="Albert Einstein",
@@ -276,6 +298,12 @@ the session's `bulk_save_objects()` instance method:
     print(f"New student ID is {albert_einstein.student_id}.")
     print(f"New student ID is {alan_turing.student_id}.")
 
+```
+
+Let's run the script again to see what we've got:
+
+```console
+$ python app/sqlalchemy_sandbox.py
 # => New student ID is None.
 # => New student ID is None.
 ```
@@ -284,7 +312,7 @@ Unfortunately, `bulk_save_objects()` does not associate the records with the
 session, so we don't update our records' IDs. Take this into consideration when
 creating records in your own code.
 
-Run `lib/sqlalchemy_sandbox.py` to make sure that there are no errors in your
+Run `app/sqlalchemy_sandbox.py` to make sure that there are no errors in your
 code. Once you're seeing the same output as above, let's practice retrieving
 these new records from the database.
 
@@ -296,12 +324,17 @@ There are many ways to structure a query in SQLAlchemy, but they all begin with
 the session's `query()` instance method:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     session.bulk_save_objects([albert_einstein, alan_turing])
     session.commit()
 
     students = session.query(Student)
+
     print([student for student in students])
 
 # => [Student 1: Albert Einstein, Grade 6, Student 2: Alan Turing, Grade 11]
@@ -310,12 +343,17 @@ the session's `query()` instance method:
 We would see the same output using the `all()` instance method:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     session.bulk_save_objects([albert_einstein, alan_turing])
     session.commit()
 
     students = session.query(Student).all()
+
     print(students)
 
 # => [Student 1: Albert Einstein, Grade 6, Student 2: Alan Turing, Grade 11]
@@ -329,7 +367,7 @@ objects one at a time and is thus more memory-efficient.
     <em>Which method helps make an object's standard output human-readable?</em>
   </summary>
 
-  <h3><code>__repr__</code></h3>
+  <h3><code>__repr__()</code></h3>
 </details>
 <br/>
 
@@ -341,9 +379,14 @@ specify this in the arguments we pass to `query()`. Here's how we would retrieve
 all of the students' names:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     student_names = [name for name in session.query(Student.student_name)]
+
     print(student_names)
 
 # => [('Albert Einstein',), ('Alan Turing',)]
@@ -355,11 +398,16 @@ By default, results from any database query are ordered by their primary key.
 The `order_by()` method allows us to sort by any column:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     students_by_name = [student for student in session.query(
             Student.student_name).order_by(
             Student.student_name)]
+
     print(students_by_name)
 
 # => [('Alan Turing',), ('Albert Einstein',)]
@@ -374,15 +422,20 @@ The `order_by()` method allows us to sort by any column:
 </details>
 <br/>
 
-To sort results in descending order, we need to import the `desc()` function:
+To sort results in descending order, we need to use the `desc()` function from
+the `sqlalchemy` module:
 
 ```py
-# imports, models, script
-from sqlalchemy import desc
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     students_by_grade_desc = [student for student in session.query(
             Student.student_name, Student.student_grade).order_by(
             desc(Student.student_grade))]
+
     print(students_by_grade_desc)
 
 # => [('Alan Turing', 11), ('Albert Einstein', 6)]
@@ -394,11 +447,16 @@ To limit your result set to the first `x` records, you can use the `limit()`
 method:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     oldest_student = [student for student in session.query(
             Student.student_name, Student.student_birthday).order_by(
             desc(Student.student_grade)).limit(1)]
+
     print(oldest_student)
 
 # => [('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))]
@@ -408,11 +466,16 @@ The `first()` method is a quick and easy way to execute a `limit(1)` statement
 and does not require a list interpretation:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     oldest_student = session.query(
             Student.student_name, Student.student_birthday).order_by(
             desc(Student.student_grade)).first()
+
     print(oldest_student)
 
 # => ('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))
@@ -420,16 +483,20 @@ and does not require a list interpretation:
 
 ### `func`
 
-Importing the `func` module from `sqlalchemy` gives us access to common SQL
-operations through functions like `sum()` and `count()`. As these operations
-act upon columns, we carry them out through wrapping a `Column` object passed
-to the `query()` method:
+Importing `func` from `sqlalchemy` gives us access to common SQL operations
+through functions like `sum()` and `count()`. As these operations act upon
+columns, we carry them out through wrapping a `Column` object passed to the
+`query()` method:
 
 ```py
-# imports, models, script
-from sqlalchemy import func
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     student_count = session.query(func.count(Student.student_id)).first()
+
     print(student_count)
 
 # => (2,)
@@ -448,10 +515,15 @@ typically easier to read with comma-separated clauses inside of one `filter()`
 statement.
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     query = session.query(Student).filter(Student.student_name.like('%Alan%'),
         Student.student_grade == 11)
+
     for record in query:
         print(record.student_name)
 
@@ -468,7 +540,11 @@ session. For instance, let's say that a new school year is starting and our
 students all need to be moved up a grade:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     for student in session.query(Student):
         student.student_grade += 1
@@ -485,7 +561,11 @@ The `update()` method allows us to update records without creating objects
 beforehand. Here's how we would carry out the same statement with `update()`:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     session.query(Student).update({
         Student.student_grade: Student.student_grade + 1
@@ -511,7 +591,11 @@ you have an object in memory that you want to delete, you can call the
 `delete()` method on the object from your `session`:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     query = session.query(
         Student).filter(
@@ -526,6 +610,7 @@ you have an object in memory that you want to delete, you can call the
 
     # try to retrieve deleted record
     albert_einstein = query.first()
+    
     print(albert_einstein)
 
 # => None
@@ -535,7 +620,11 @@ If you don't have a single object ready for deletion but you know the criteria
 for deletion, you can call the `delete()` method from your query instead:
 
 ```py
-# imports, models, script
+# imports, models
+
+if __name__ == '__main__':
+
+    # create session, student objects
 
     query = session.query(
         Student).filter(
@@ -544,6 +633,7 @@ for deletion, you can call the `delete()` method from your query instead:
     query.delete()
 
     albert_einstein = query.first()
+
     print(albert_einstein)
 
 # => None

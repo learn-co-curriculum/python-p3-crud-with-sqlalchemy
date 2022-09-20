@@ -7,9 +7,5 @@ name = "pypi"
 ipdb = "*"
 sqlalchemy = "*"
 
-[dev-packages]
-sqlalchemy = "*"
-ipdb = "*"
-
 [requires]
-python_version = "3.8"
+python_version = "3.8.13"

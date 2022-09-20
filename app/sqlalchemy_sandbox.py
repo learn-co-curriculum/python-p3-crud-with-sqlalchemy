@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Column, Integer, String
-from sqlalchemy import create_engine
+from datetime import datetime
+
+from sqlalchemy import create_engine, desc, func, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
