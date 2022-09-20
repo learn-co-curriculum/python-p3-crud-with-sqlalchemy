@@ -66,7 +66,9 @@ statements in `students.db`:
 
 from datetime import datetime
 
-from sqlalchemy import create_engine, desc, func, Column, Integer, String
+from sqlalchemy import (create_engine, desc,
+    CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
+    Index, Column, DateTime, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
