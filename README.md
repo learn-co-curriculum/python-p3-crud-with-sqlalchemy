@@ -455,11 +455,11 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    oldest_student = [student for student in session.query(
+    youngest_student = [student for student in session.query(
             Student.student_name, Student.student_birthday).order_by(
             desc(Student.student_grade)).limit(1)]
 
-    print(oldest_student)
+    print(youngest_student)
 
 # => [('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))]
 ```
@@ -474,11 +474,11 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    oldest_student = session.query(
+    youngest_student = session.query(
             Student.student_name, Student.student_birthday).order_by(
             desc(Student.student_grade)).first()
 
-    print(oldest_student)
+    print(youngest_student)
 
 # => ('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))
 ```
