@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import (create_engine, desc,
+from sqlalchemy import (create_engine, desc, func,
     CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
     Index, Column, DateTime, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
