@@ -14,28 +14,28 @@ class Student(Base):
     __tablename__ = 'students'
     __table_args__ = (
         PrimaryKeyConstraint(
-            'student_id',
+            'id',
             name='id_pk'),
         UniqueConstraint(
-            'student_email',
+            'email',
             name='unique_email'),
         CheckConstraint(
-            'student_grade BETWEEN 1 AND 12',
+            'grade BETWEEN 1 AND 12',
             name='grade_between_1_and_12'))
 
-    Index('index_student_name', 'student_name')
+    Index('index_name', 'name')
 
-    student_id = Column(Integer())
-    student_name = Column(String())
-    student_email = Column(String(55))
-    student_grade = Column(Integer())
-    student_birthday = Column(DateTime())
-    student_enrolled_date = Column(DateTime(), default=datetime.now())
+    id = Column(Integer())
+    name = Column(String())
+    email = Column(String(55))
+    grade = Column(Integer())
+    birthday = Column(DateTime())
+    enrolled_date = Column(DateTime(), default=datetime.now())
 
     def __repr__(self):
-        return f"Student {self.student_id}: " \
-            + f"{self.student_name}, " \
-            + f"Grade {self.student_grade}"
+        return f"Student {self.id}: " \
+            + f"{self.name}, " \
+            + f"Grade {self.grade}"
 
 if __name__ == '__main__':
     
@@ -46,10 +46,10 @@ if __name__ == '__main__':
     session = Session()
 
     albert_einstein = Student(
-        student_name="Albert Einstein",
-        student_email="albert.einstein@zurich.edu",
-        student_grade=6,
-        student_birthday=datetime(
+        name="Albert Einstein",
+        email="albert.einstein@zurich.edu",
+        grade=6,
+        birthday=datetime(
             year=1879,
             month=3,
             day=14
@@ -57,10 +57,10 @@ if __name__ == '__main__':
     )
 
     alan_turing = Student(
-        student_name="Alan Turing",
-        student_email="alan.turing@sherborne.edu",
-        student_grade=11,
-        student_birthday=datetime(
+        name="Alan Turing",
+        email="alan.turing@sherborne.edu",
+        grade=11,
+        birthday=datetime(
             year=1912,
             month=6,
             day=23
@@ -69,5 +69,3 @@ if __name__ == '__main__':
 
     session.bulk_save_objects([albert_einstein, alan_turing])
     session.commit()
-
-    # CRUD goes here!

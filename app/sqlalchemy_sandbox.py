@@ -13,8 +13,8 @@ Base = declarative_base()
 class Student(Base):
     __tablename__ = 'students'
 
-    student_id = Column(Integer(), primary_key=True)
-    student_name = Column(String())
+    id = Column(Integer(), primary_key=True)
+    name = Column(String())
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///:memory:')

@@ -77,8 +77,8 @@ Base = declarative_base()
 class Student(Base):
     __tablename__ = 'students'
 
-    student_id = Column(Integer(), primary_key=True)
-    student_name = Column(String())
+    id = Column(Integer(), primary_key=True)
+    name = Column(String())
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///:memory:')
@@ -124,29 +124,29 @@ class Student(Base):
     __tablename__ = 'students'
     __table_args__ = (
         PrimaryKeyConstraint(
-            'student_id',
+            'id',
             name='id_pk'),
         UniqueConstraint(
-            'student_email',
+            'email',
             name='unique_email'),
         CheckConstraint(
-            'student_grade BETWEEN 1 AND 12',
+            'grade BETWEEN 1 AND 12',
             name='grade_between_1_and_12')
     )
 
-    Index('index_student_name', 'student_name')
+    Index('index_name', 'name')
 
-    student_id = Column(Integer())
-    student_name = Column(String())
-    student_email = Column(String(55))
-    student_grade = Column(Integer())
-    student_birthday = Column(DateTime())
-    student_enrolled_date = Column(DateTime(), default=datetime.now())
+    id = Column(Integer())
+    name = Column(String())
+    email = Column(String(55))
+    grade = Column(Integer())
+    birthday = Column(DateTime())
+    enrolled_date = Column(DateTime(), default=datetime.now())
 
     def __repr__(self):
-        return f"Student {self.student_id}: " \
-            + f"{self.student_name}, " \
-            + f"Grade {self.student_grade}"
+        return f"Student {self.id}: " \
+            + f"{self.name}, " \
+            + f"Grade {self.grade}"
 
 # script
 
@@ -168,15 +168,15 @@ before being stored in the database. Constraints are stored in the optional
 3. `CheckConstraint`: uses SQL statements to check if new values meet
    specific criteria.
 
-Our new constraints for the `Student` model ensure that `student_id` is a
-primary key, `student_email` is unique, and `student_grade` is between 1 and
+Our new constraints for the `Student` model ensure that `id` is a
+primary key, `email` is unique, and `grade` is between 1 and
 12.
 
 #### Indexes
 
 Indexes are used to speed up lookups on certain column values. Since teachers
 and administrators don't typically know their student's ID numbers off the top
-of their heads, it's wise to set up an index for `student_name` in preparation
+of their heads, it's wise to set up an index for `name` in preparation
 for people using it in their database transactions.
 
 #### `__repr__()`
@@ -229,10 +229,10 @@ if __name__ == '__main__':
     session = Session()
 
     albert_einstein = Student(
-        student_name="Albert Einstein",
-        student_email="albert.einstein@zurich.edu",
-        student_grade=6,
-        student_birthday=datetime(
+        name="Albert Einstein",
+        email="albert.einstein@zurich.edu",
+        grade=6,
+        birthday=datetime(
             year=1879,
             month=3,
             day=14
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     session.add(albert_einstein)
     session.commit()
 
-    print(f"New student ID is {albert_einstein.student_id}.")
+    print(f"New student ID is {albert_einstein.id}.")
 
 ```
 
@@ -256,7 +256,7 @@ $ python app/sqlalchemy_sandbox.py
 After creating a `Student` object, `session.add()` generates a statement to
 include in the session's transaction, then `session.commit()` executes all
 statements in the transaction and saves any changes to the database.
-`session.commit()` will also update your `Student` object with a `student_id`.
+`session.commit()` will also update your `Student` object with a `id`.
 
 If we want to save multiple new records in a single line of code, we can use
 the session's `bulk_save_objects()` instance method:
@@ -273,10 +273,10 @@ if __name__ == '__main__':
     session = Session()
 
     albert_einstein = Student(
-        student_name="Albert Einstein",
-        student_email="albert.einstein@zurich.edu",
-        student_grade=6,
-        student_birthday=datetime(
+        name="Albert Einstein",
+        email="albert.einstein@zurich.edu",
+        grade=6,
+        birthday=datetime(
             year=1879,
             month=3,
             day=14
@@ -284,10 +284,10 @@ if __name__ == '__main__':
     )
 
     alan_turing = Student(
-        student_name="Alan Turing",
-        student_email="alan.turing@sherborne.edu",
-        student_grade=11,
-        student_birthday=datetime(
+        name="Alan Turing",
+        email="alan.turing@sherborne.edu",
+        grade=11,
+        birthday=datetime(
             year=1912,
             month=6,
             day=23
@@ -297,8 +297,8 @@ if __name__ == '__main__':
     session.bulk_save_objects([albert_einstein, alan_turing])
     session.commit()
 
-    print(f"New student ID is {albert_einstein.student_id}.")
-    print(f"New student ID is {alan_turing.student_id}.")
+    print(f"New student ID is {albert_einstein.id}.")
+    print(f"New student ID is {alan_turing.id}.")
 
 ```
 
@@ -387,9 +387,9 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    student_names = [name for name in session.query(Student.student_name)]
+    names = [name for name in session.query(Student.name)]
 
-    print(student_names)
+    print(names)
 
 # => [('Albert Einstein',), ('Alan Turing',)]
 ```
@@ -407,8 +407,8 @@ if __name__ == '__main__':
     # create session, student objects
 
     students_by_name = [student for student in session.query(
-            Student.student_name).order_by(
-            Student.student_name)]
+            Student.name).order_by(
+            Student.name)]
 
     print(students_by_name)
 
@@ -435,8 +435,8 @@ if __name__ == '__main__':
     # create session, student objects
 
     students_by_grade_desc = [student for student in session.query(
-            Student.student_name, Student.student_grade).order_by(
-            desc(Student.student_grade))]
+            Student.name, Student.grade).order_by(
+            desc(Student.grade))]
 
     print(students_by_grade_desc)
 
@@ -456,8 +456,8 @@ if __name__ == '__main__':
     # create session, student objects
 
     oldest_student = [student for student in session.query(
-            Student.student_name, Student.student_birthday).order_by(
-            desc(Student.student_grade)).limit(1)]
+            Student.name, Student.birthday).order_by(
+            desc(Student.grade)).limit(1)]
 
     print(oldest_student)
 
@@ -475,8 +475,8 @@ if __name__ == '__main__':
     # create session, student objects
 
     oldest_student = session.query(
-            Student.student_name, Student.student_birthday).order_by(
-            desc(Student.student_grade)).first()
+            Student.name, Student.birthday).order_by(
+            desc(Student.grade)).first()
 
     print(oldest_student)
 
@@ -497,7 +497,7 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    student_count = session.query(func.count(Student.student_id)).first()
+    student_count = session.query(func.count(Student.id)).first()
 
     print(student_count)
 
@@ -523,11 +523,11 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    query = session.query(Student).filter(Student.student_name.like('%Alan%'),
-        Student.student_grade == 11)
+    query = session.query(Student).filter(Student.name.like('%Alan%'),
+        Student.grade == 11)
 
     for record in query:
-        print(record.student_name)
+        print(record.name)
 
 # => Alan Turing
 ```
@@ -549,12 +549,12 @@ if __name__ == '__main__':
     # create session, student objects
 
     for student in session.query(Student):
-        student.student_grade += 1
+        student.grade += 1
     
     session.commit()
 
-    print([(student.student_name,
-        student.student_grade) for student in session.query(Student)])
+    print([(student.name,
+        student.grade) for student in session.query(Student)])
 
 # => [('Albert Einstein', 7), ('Alan Turing', 12)]
 ```
@@ -570,11 +570,11 @@ if __name__ == '__main__':
     # create session, student objects
 
     session.query(Student).update({
-        Student.student_grade: Student.student_grade + 1
+        Student.grade: Student.grade + 1
     })
     
-    print([(student.student_name,
-        student.student_grade) for student in session.query(Student)])
+    print([(student.name,
+        student.grade) for student in session.query(Student)])
 
 # => [('Albert Einstein', 7), ('Alan Turing', 12)]
 ```
@@ -601,7 +601,7 @@ if __name__ == '__main__':
 
     query = session.query(
         Student).filter(
-            Student.student_name == "Albert Einstein")        
+            Student.name == "Albert Einstein")        
 
     # retrieve first matching record as object
     albert_einstein = query.first()
@@ -630,7 +630,7 @@ if __name__ == '__main__':
 
     query = session.query(
         Student).filter(
-            Student.student_name == "Albert Einstein")
+            Student.name == "Albert Einstein")
 
     query.delete()
 
@@ -654,6 +654,85 @@ those interactions are grouped into **transactions**. There are hundreds of
 methods, operations, and filter criteria available in SQLAlchemy, so make sure
 to keep the [SQLAlchemy ORM documentation][sqlaorm] nearby as you finish up
 Phase 3!
+
+***
+
+## Solution Code
+
+```py
+# app/sqlalchemy_sandbox.py
+
+from datetime import datetime
+
+from sqlalchemy import (create_engine, desc,
+    CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
+    Index, Column, DateTime, Integer, String)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+Base = declarative_base()
+
+class Student(Base):
+    __tablename__ = 'students'
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            'id',
+            name='id_pk'),
+        UniqueConstraint(
+            'email',
+            name='unique_email'),
+        CheckConstraint(
+            'grade BETWEEN 1 AND 12',
+            name='grade_between_1_and_12'))
+
+    Index('index_name', 'name')
+
+    id = Column(Integer())
+    name = Column(String())
+    email = Column(String(55))
+    grade = Column(Integer())
+    birthday = Column(DateTime())
+    enrolled_date = Column(DateTime(), default=datetime.now())
+
+    def __repr__(self):
+        return f"Student {self.id}: " \
+            + f"{self.name}, " \
+            + f"Grade {self.grade}"
+
+if __name__ == '__main__':
+    
+    engine = create_engine('sqlite:///:memory:')
+    Base.metadata.create_all(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    albert_einstein = Student(
+        student_name="Albert Einstein",
+        student_email="albert.einstein@zurich.edu",
+        student_grade=6,
+        student_birthday=datetime(
+            year=1879,
+            month=3,
+            day=14
+        ),
+    )
+
+    alan_turing = Student(
+        student_name="Alan Turing",
+        student_email="alan.turing@sherborne.edu",
+        student_grade=11,
+        student_birthday=datetime(
+            year=1912,
+            month=6,
+            day=23
+        ),
+    )
+
+    session.bulk_save_objects([albert_einstein, alan_turing])
+    session.commit()
+
+```
 
 ***
 
