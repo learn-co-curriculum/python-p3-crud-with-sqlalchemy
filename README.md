@@ -361,9 +361,6 @@ if __name__ == '__main__':
 # => [Student 1: Albert Einstein, Grade 6, Student 2: Alan Turing, Grade 11]
 ```
 
-The former strategy is considered best practice, as it accesses the returned
-objects one at a time and is thus more memory-efficient.
-
 <details>
   <summary>
     <em>Which method helps make an object's standard output human-readable?</em>
