@@ -570,8 +570,10 @@ if __name__ == '__main__':
         Student.grade: Student.grade + 1
     })
     
-    print([(student.name,
-        student.grade) for student in session.query(Student)])
+    print([(
+        student.name,
+        student.grade
+    ) for student in session.query(Student)])
 
 # => [('Albert Einstein', 7), ('Alan Turing', 12)]
 ```
