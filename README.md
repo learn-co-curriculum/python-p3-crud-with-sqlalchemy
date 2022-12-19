@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    names = [name for name in session.query(Student.name)]
+    names = session.query(Student.name).all()
 
     print(names)
 
@@ -403,9 +403,9 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    students_by_name = [student for student in session.query(
+    students_by_name = session.query(
             Student.name).order_by(
-            Student.name)]
+            Student.name).all()
 
     print(students_by_name)
 
@@ -431,9 +431,9 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    students_by_grade_desc = [student for student in session.query(
+    students_by_grade_desc = session.query(
             Student.name, Student.grade).order_by(
-            desc(Student.grade))]
+            desc(Student.grade)).all()
 
     print(students_by_grade_desc)
 
@@ -452,9 +452,9 @@ if __name__ == '__main__':
 
     # create session, student objects
 
-    oldest_student = [student for student in session.query(
+    oldest_student = session.query(
             Student.name, Student.birthday).order_by(
-            desc(Student.grade)).limit(1)]
+            desc(Student.grade)).limit(1)
 
     print(oldest_student)
 
