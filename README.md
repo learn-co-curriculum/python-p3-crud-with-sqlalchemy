@@ -67,7 +67,6 @@ statements in `students.db`:
 from datetime import datetime
 
 from sqlalchemy import (create_engine, desc,
-    CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
     Index, Column, DateTime, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -122,21 +121,10 @@ the `Student` model from the previous lesson:
 
 class Student(Base):
     __tablename__ = 'students'
-    __table_args__ = (
-        PrimaryKeyConstraint(
-            'id',
-            name='id_pk'),
-        UniqueConstraint(
-            'email',
-            name='unique_email'),
-        CheckConstraint(
-            'grade BETWEEN 1 AND 12',
-            name='grade_between_1_and_12')
-    )
 
     Index('index_name', 'name')
 
-    id = Column(Integer())
+    id = Column(Integer(), primary_key=True)
     name = Column(String())
     email = Column(String(55))
     grade = Column(Integer())
@@ -153,24 +141,6 @@ class Student(Base):
 ```
 
 Let's break down some of the new features in the `Student` model:
-
-#### Constraints
-
-Along with keys, constraints help ensure that our data meets certain criteria
-before being stored in the database. Constraints are stored in the optional
-`__table_args__` class attribute. There are three main classes of constraint:
-
-1. `PrimaryKeyConstraint`: assigns primary key status to a `Column`. This can
-   also be accomplished through the optional `primary_key` argument to the
-   `Column` class constructor.
-2. `UniqueConstraint`: checks new records to ensure that they do not match
-   existing records at unique `Column`s.
-3. `CheckConstraint`: uses SQL statements to check if new values meet
-   specific criteria.
-
-Our new constraints for the `Student` model ensure that `id` is a
-primary key, `email` is unique, and `grade` is between 1 and
-12.
 
 #### Indexes
 
@@ -664,7 +634,6 @@ Phase 3!
 from datetime import datetime
 
 from sqlalchemy import (create_engine, desc,
-    CheckConstraint, PrimaryKeyConstraint, UniqueConstraint,
     Index, Column, DateTime, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -673,20 +642,10 @@ Base = declarative_base()
 
 class Student(Base):
     __tablename__ = 'students'
-    __table_args__ = (
-        PrimaryKeyConstraint(
-            'id',
-            name='id_pk'),
-        UniqueConstraint(
-            'email',
-            name='unique_email'),
-        CheckConstraint(
-            'grade BETWEEN 1 AND 12',
-            name='grade_between_1_and_12'))
 
     Index('index_name', 'name')
 
-    id = Column(Integer())
+    id = Column(Integer(), primary_key=True)
     name = Column(String())
     email = Column(String(55))
     grade = Column(Integer())
