@@ -424,7 +424,7 @@ if __name__ == '__main__':
 
     oldest_student = session.query(
             Student.name, Student.birthday).order_by(
-            desc(Student.grade)).limit(1)
+            desc(Student.grade)).limit(1).all()
 
     print(oldest_student)
 
