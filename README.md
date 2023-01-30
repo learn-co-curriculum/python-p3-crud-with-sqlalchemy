@@ -424,7 +424,7 @@ if __name__ == '__main__':
 
     oldest_student = session.query(
             Student.name, Student.birthday).order_by(
-            desc(Student.grade)).limit(1)
+            desc(Student.grade)).limit(1).all()
 
     print(oldest_student)
 
@@ -491,7 +491,7 @@ if __name__ == '__main__':
     # create session, student objects
 
     query = session.query(Student).filter(Student.name.like('%Alan%'),
-        Student.grade == 11)
+        Student.grade == 11).all()
 
     for record in query:
         print(record.name)
