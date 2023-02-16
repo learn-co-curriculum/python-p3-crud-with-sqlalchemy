@@ -30,13 +30,20 @@ SQLAlchemy. This required us to define classes that inherited from a common
 used to assign a table name, columns, primary keys, and more.
 
 In this lesson, we'll be building on the same schema. The code from last
-lesson's code-along can be found in `app/sqlalchemy_sandbox.py`. Run
-`chmod +x app/sqlalchemy_sandbox.py` to make it executable.
+lesson's code-along can be found in `lib/sqlalchemy_sandbox.py`. Run
+`chmod +x lib/sqlalchemy_sandbox.py` to make it executable.
 
 > **Note**: we are using a SQLite database in memory now instead of a
 > `students.db` file. This will allow us to make changes to our schema without
 > running into issues. We will learn how to address changing a schema when we
 > discuss **migrations** later in this module.
+
+Before you begin coding along, remember to run the following command to set up
+your virtual environment:
+
+```console
+$ pipenv install; pipenv shell
+```
 
 ***
 
@@ -60,7 +67,7 @@ Let's create a session in `sqlalchemy_sandbox.py` so that we can start executing
 statements in `students.db`:
 
 ```py
-# app/sqlalchemy_sandbox.py
+# lib/sqlalchemy_sandbox.py
 
 #!/usr/bin/env python3
 
@@ -89,7 +96,7 @@ if __name__ == '__main__':
     session = Session()
 ```
 
-Run `app/sqlalchemy_sandbox.py` to persist your schema and create a session.
+Run `lib/sqlalchemy_sandbox.py` to persist your schema and create a session.
 You won't see anything yet, but it's always wise to stop and check for errors
 after you change the functionality of your code.
 
@@ -219,7 +226,7 @@ if __name__ == '__main__':
 Now when we run our script from the command line, we see the following:
 
 ```console
-$ python app/sqlalchemy_sandbox.py
+$ python lib/sqlalchemy_sandbox.py
 # => New student ID is 1.
 ```
 
@@ -275,7 +282,7 @@ if __name__ == '__main__':
 Let's run the script again to see what we've got:
 
 ```console
-$ python app/sqlalchemy_sandbox.py
+$ python lib/sqlalchemy_sandbox.py
 # => New student ID is None.
 # => New student ID is None.
 ```
@@ -284,7 +291,7 @@ Unfortunately, `bulk_save_objects()` does not associate the records with the
 session, so we don't update our records' IDs. Take this into consideration when
 creating records in your own code.
 
-Run `app/sqlalchemy_sandbox.py` to make sure that there are no errors in your
+Run `lib/sqlalchemy_sandbox.py` to make sure that there are no errors in your
 code. Once you're seeing the same output as above, let's practice retrieving
 these new records from the database.
 
@@ -629,7 +636,7 @@ Phase 3!
 ## Solution Code
 
 ```py
-# app/sqlalchemy_sandbox.py
+# lib/sqlalchemy_sandbox.py
 
 from datetime import datetime
 
