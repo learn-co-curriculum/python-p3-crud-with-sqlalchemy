@@ -1,4 +1,4 @@
-# Create, Read, Update, and Delete with SQLAlchemy
+# Create Read Update and Delete with SQLAlchemy
 
 ## Learning Goals
 
