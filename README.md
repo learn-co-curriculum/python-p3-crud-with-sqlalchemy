@@ -5,7 +5,7 @@
 - Use an external library to simplify tasks from earlier ORM lessons.
 - Use SQLAlchemy to create, read, update and delete records in a SQL database.
 
-***
+---
 
 ## Key Vocab
 
@@ -15,12 +15,12 @@
 - **Engine**: a Python object that translates SQL to Python and vice-versa.
 - **Session**: a Python object that uses an engine to allow us to
   programmatically interact with a database.
-- **Transaction**: a strategy for executing database statements such that
-  the group succeeds or fails as a unit.
-- **Migration**: the process of moving data from one or more databases to one
-  or more target databases.
+- **Transaction**: a strategy for executing database statements such that the
+  group succeeds or fails as a unit.
+- **Migration**: the process of moving data from one or more databases to one or
+  more target databases.
 
-***
+---
 
 ## Introduction
 
@@ -45,7 +45,7 @@ your virtual environment:
 $ pipenv install; pipenv shell
 ```
 
-***
+---
 
 ## The Session
 
@@ -96,30 +96,30 @@ if __name__ == '__main__':
     session = Session()
 ```
 
-Run `lib/sqlalchemy_sandbox.py` to persist your schema and create a session.
-You won't see anything yet, but it's always wise to stop and check for errors
-after you change the functionality of your code.
+Run `lib/sqlalchemy_sandbox.py` to persist your schema and create a session. You
+won't see anything yet, but it's always wise to stop and check for errors after
+you change the functionality of your code.
 
 ### Transactions
 
-**Transactions** are a strategy for executing SQL statements via ORM that
-ensure that they all succeed or fail as a group. This is especially important
-if statements that occur later on depend on earlier statements executing
-properly. The workflow for a transaction is illustrated in the image below:
+**Transactions** are a strategy for executing SQL statements via ORM that ensure
+that they all succeed or fail as a group. This is especially important if
+statements that occur later on depend on earlier statements executing properly.
+The workflow for a transaction is illustrated in the image below:
 
 ![Workflow for a successful transaction. Shows that after a transaction begins,
 the state of the database is recorded, then statements are executed, then the
-transaction is committed if all statements are successful.](
-https://curriculum-content.s3.amazonaws.com/python/esal_0401.png "successful transaction")
+transaction is committed if all statements are successful.](https://curriculum-content.s3.amazonaws.com/python/esal_0401.png "successful transaction")
 
-If any of the SQL statements in the above image fail to execute properly,
-the database will be rolled back to the state recorded at the beginning of the
+If any of the SQL statements in the above image fail to execute properly, the
+database will be rolled back to the state recorded at the beginning of the
 transaction and the process will end, returning an error message.
 
 ### Refactoring our Schema
 
 Before we begin transactions on our database, let's take a moment to build upon
-the `Student` model from the previous lesson:
+the `Student` model from the previous lesson. Edit the `Student` class as shown
+below:
 
 ```py
 #!/usr/bin/env python3
@@ -153,8 +153,8 @@ Let's break down some of the new features in the `Student` model:
 
 Indexes are used to speed up lookups on certain column values. Since teachers
 and administrators don't typically know their student's ID numbers off the top
-of their heads, it's wise to set up an index for `name` in preparation
-for people using it in their database transactions.
+of their heads, it's wise to set up an index for `name` in preparation for
+people using it in their database transactions.
 
 #### `__repr__()`
 
@@ -163,8 +163,8 @@ standard output value (i.e. what you see when you `print()` the object). By
 default, this shows the classname and an arbitrary ID. This default value is not
 very helpful in telling different objects apart. (At least not to humans.)
 
-The `__repr__()` method in our refactored `Student` class will output a much more
-helpful string:
+The `__repr__()` method in our refactored `Student` class will output a much
+more helpful string:
 
 ```py
 my_student = Student(...)
@@ -178,7 +178,7 @@ SQLAlchemy provides a number of other optional arguments in the `Column` and
 data-type constructors that will allow you to make your code more specific and
 secure. Explore [the `Column` documentation][column] to learn more.
 
-***
+---
 
 ## Creating Records
 
@@ -189,10 +189,10 @@ To create a new student record in our database, we need to create an object
 using the `Student` class. This syntax is the same as with instantiating any
 other Python class.
 
-> **Note**: while we can enter the data in order without argument names, we
-> are going to use them consistently in class constructors when using
-> SQLAlchemy. This is because it makes our code much more readable when working
-> with tables with many columns.
+> **Note**: while we can enter the data in order without argument names, we are
+> going to use them consistently in class constructors when using SQLAlchemy.
+> This is because it makes our code much more readable when working with tables
+> with many columns.
 
 ```py
 # imports, models
@@ -215,7 +215,7 @@ if __name__ == '__main__':
             day=14
         ),
     )
-    
+
     session.add(albert_einstein)
     session.commit()
 
@@ -235,8 +235,8 @@ include in the session's transaction, then `session.commit()` executes all
 statements in the transaction and saves any changes to the database.
 `session.commit()` will also update your `Student` object with a `id`.
 
-If we want to save multiple new records in a single line of code, we can use
-the session's `bulk_save_objects()` instance method:
+If we want to save multiple new records in a single line of code, we can use the
+session's `bulk_save_objects()` instance method:
 
 ```py
 # imports, models
@@ -295,7 +295,7 @@ Run `lib/sqlalchemy_sandbox.py` to make sure that there are no errors in your
 code. Once you're seeing the same output as above, let's practice retrieving
 these new records from the database.
 
-***
+---
 
 ## Read Records
 
@@ -435,7 +435,7 @@ if __name__ == '__main__':
 
     print(oldest_student)
 
-# => [('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))]
+# => [('Albert Einstein', datetime.datetime(1879, 3, 14, 0, 0))]
 ```
 
 The `first()` method is a quick and easy way to execute a `limit(1)` statement
@@ -454,7 +454,7 @@ if __name__ == '__main__':
 
     print(oldest_student)
 
-# => ('Alan Turing', datetime.datetime(1912, 6, 23, 0, 0))
+# => ('Albert Einstein', datetime.datetime(1879, 3, 14, 0, 0))
 ```
 
 ### `func`
@@ -506,7 +506,7 @@ if __name__ == '__main__':
 # => Alan Turing
 ```
 
-***
+---
 
 ## Updating Data
 
@@ -524,7 +524,7 @@ if __name__ == '__main__':
 
     for student in session.query(Student):
         student.grade += 1
-    
+
     session.commit()
 
     print([(student.name,
@@ -546,7 +546,7 @@ if __name__ == '__main__':
     session.query(Student).update({
         Student.grade: Student.grade + 1
     })
-    
+
     print([(
         student.name,
         student.grade
@@ -560,13 +560,13 @@ if __name__ == '__main__':
 > attributes have changed, the returned object still has access to the same
 > methods as the original object.
 
-***
+---
 
 ## Deleting Data
 
-To delete a record from your database, you can use the `delete()` method. If
-you have an object in memory that you want to delete, you can call the
-`delete()` method on the object from your `session`:
+To delete a record from your database, you can use the `delete()` method. If you
+have an object in memory that you want to delete, you can call the `delete()`
+method on the object from your `session`:
 
 ```py
 # imports, models
@@ -577,7 +577,7 @@ if __name__ == '__main__':
 
     query = session.query(
         Student).filter(
-            Student.name == "Albert Einstein")        
+            Student.name == "Albert Einstein")
 
     # retrieve first matching record as object
     albert_einstein = query.first()
@@ -588,7 +588,7 @@ if __name__ == '__main__':
 
     # try to retrieve deleted record
     albert_einstein = query.first()
-    
+
     print(albert_einstein)
 
 # => None
@@ -619,7 +619,7 @@ if __name__ == '__main__':
 
 This strategy will delete all records returned by your query, so be careful!
 
-***
+---
 
 ## Conclusion
 
@@ -631,7 +631,7 @@ methods, operations, and filter criteria available in SQLAlchemy, so make sure
 to keep the [SQLAlchemy ORM documentation][sqlaorm] nearby as you finish up
 Phase 3!
 
-***
+---
 
 ## Solution Code
 
@@ -665,7 +665,7 @@ class Student(Base):
             + f"Grade {self.grade}"
 
 if __name__ == '__main__':
-    
+
     engine = create_engine('sqlite:///:memory:')
     Base.metadata.create_all(engine)
 
@@ -699,7 +699,7 @@ if __name__ == '__main__':
 
 ```
 
-***
+---
 
 ## Resources
 
